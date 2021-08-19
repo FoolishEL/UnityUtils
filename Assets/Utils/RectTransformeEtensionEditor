@@ -3,6 +3,9 @@ using UnityEditor;
 using System.Reflection;
 using System;
 
+/// <summary>
+/// Extention for RectTransform allowing to set anchors to object sizes
+/// </summary>
 [CustomEditor(typeof(RectTransform), true)]
 public class RectTransformExtensionEditor : Editor
 {
