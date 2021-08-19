@@ -1,0 +1,61 @@
+using UnityEngine;
+using UnityEditor;
+using System.Reflection;
+using System;
+
+[CustomEditor(typeof(RectTransform), true)]
+public class RectTransformExtensionEditor : Editor
+{
+    private Editor editorInstance;
+
+    private void OnEnable()
+    {
+        Assembly assembly = Assembly.GetAssembly(typeof(Editor));
+        Type rtEditor = assembly.GetType("UnityEditor.RectTransformEditor");
+        editorInstance = CreateEditor(target, rtEditor);
+    }
+
+    private void OnSceneGUI()
+    {
+        MethodInfo onSceneGUIMethod = editorInstance.GetType().GetMethod("OnSceneGUI", BindingFlags.NonPublic | BindingFlags.Instance);
+        onSceneGUIMethod.Invoke(editorInstance, null);
+    }
+    RectTransform rTransform;
+
+    public override void OnInspectorGUI()
+    {
+        rTransform = (RectTransform)target;
+        editorInstance.OnInspectorGUI();
+        if (rTransform.parent)
+            if (GUILayout.Button("Set custom anchers"))
+            {
+                calculate();
+            }
+    }
+
+    private void calculate()
+    {
+        var parent = rTransform.parent as RectTransform;
+        if (!parent)
+            return;
+        float rightAnchorOffcet = parent.rect.width * (1 - rTransform.anchorMax.x);
+        float rightOffsetTarget = parent.rect.width - (rightAnchorOffcet - rTransform.offsetMax.x);
+        float newRightAnchor = rightOffsetTarget / parent.rect.width;
+
+        float upperAnchorOffcet = parent.rect.height * (1 - rTransform.anchorMax.y);
+        float upperOffsetTarget = parent.rect.height - (upperAnchorOffcet - rTransform.offsetMax.y);
+        float newUpperAnchor = upperOffsetTarget / parent.rect.height;
+        rTransform.anchorMax = new Vector2(newRightAnchor, newUpperAnchor);
+        rTransform.offsetMax = new Vector2(0f, 0f);
+
+        float leftAnchorOffcet = parent.rect.width * rTransform.anchorMin.x;
+        float leftOffsetTarget = leftAnchorOffcet + rTransform.offsetMin.x;
+        float newLeftAnchor = leftOffsetTarget / parent.rect.width;
+
+        float lowerAnchorOffcet = parent.rect.height * rTransform.anchorMin.y;
+        float lowerOffsetTarger = lowerAnchorOffcet + rTransform.offsetMin.y;
+        float newLowerAnchor = lowerOffsetTarger / parent.rect.height;
+        rTransform.anchorMin = new Vector2(newLeftAnchor, newLowerAnchor);
+        rTransform.offsetMin = new Vector2(0f, 0f);
+    }
+}
