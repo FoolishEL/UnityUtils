@@ -28,6 +28,12 @@ namespace Utils.UI.Editor
             _fieldInfo = _script.GetType()
                 .GetField("_buttonHandlers", BindingFlags.Instance | BindingFlags.NonPublic);
             _targetProperty = serializedObject.FindProperty("_buttonHandlers");
+            _showContent = EditorPrefs.GetBool(nameof(ButtonViewCustomInspector) + "_" + nameof(_showContent),false);
+        }
+
+        private void OnDisable()
+        {
+            EditorPrefs.SetBool(nameof(ButtonViewCustomInspector) + "_" + nameof(_showContent),_showContent);
         }
 
         public override void OnInspectorGUI()
@@ -76,18 +82,29 @@ namespace Utils.UI.Editor
         private void HandleScriptButton(int id)
         {
             var serializedPropertyElement = _targetProperty.GetArrayElementAtIndex(id);
-            var currentElement = _typesWithMono.First(c =>
-                c.Item1 == serializedPropertyElement.managedReferenceValue.GetType());
-            if (GUILayout.Button(
-                    new GUIContent(EditorGUIUtility.FindTexture(currentElement.Item2 is not null 
-                            ? "cs Script Icon"
-                            : "console.warnicon"),
-                        currentElement.Item2 is not null ? "Ping script" : "MonoScript with this class not found!"),
-                    GUILayout.Width(25), GUILayout.Height(20)))
+            (Type, MonoScript) currentElement = default;
+            try
             {
-                EditorGUIUtility.PingObject(currentElement.Item2 is not null
-                    ? currentElement.Item2
-                    : _baseTypeMono);
+                currentElement = _typesWithMono.First(c =>
+                    c.Item1 == serializedPropertyElement.managedReferenceValue.GetType());
+            }
+            catch
+            {
+                currentElement = (_typesWithMono[id].Item1, _baseTypeMono);
+            }
+            finally
+            {
+                if (GUILayout.Button(
+                        new GUIContent(EditorGUIUtility.FindTexture(currentElement.Item2 is not null
+                                ? "cs Script Icon"
+                                : "console.warnicon"),
+                            currentElement.Item2 is not null ? "Ping script" : "MonoScript with this class not found!"),
+                        GUILayout.Width(25), GUILayout.Height(20)))
+                {
+                    EditorGUIUtility.PingObject(currentElement.Item2 is not null
+                        ? currentElement.Item2
+                        : _baseTypeMono);
+                }
             }
         }
 
