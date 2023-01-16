@@ -1,0 +1,16 @@
+{
+    "name": "Foolish.Utils.Example",
+    "rootNamespace": "Utils.Example",
+    "references": [
+        "GUID:388b322129c2845caa4e895f1f5ced96"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

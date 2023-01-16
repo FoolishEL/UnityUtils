@@ -1,0 +1,13 @@
+{
+    "name": "com.foolish.utils",
+    "displayName": "FoolishEL Utils package",
+    "version": "0.0.1",
+    "author": "Foolish ELEPHANT",
+    "description": "Utilities for Unity Games",
+    "dependencies": {
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/FoolishEL/UnityUtils.git"
+    }
+}
