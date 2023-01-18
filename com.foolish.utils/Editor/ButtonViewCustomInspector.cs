@@ -13,21 +13,21 @@ namespace Utils.UI.Editor
     [CustomEditor(typeof(ButtonView))]
     public class ButtonViewCustomInspector : Editor
     {
-        private ButtonView _script;
+        private static ButtonView _script;
 
         private SerializedProperty _targetProperty;
         private static bool _showContent;
-        private GenericMenu _menu;
-        private List<(Type, MonoScript)> _typesWithMono;
-        private MonoScript _baseTypeMono;
-        private FieldInfo _fieldInfo;
+        private static GenericMenu _menu;
+        private static List<(Type, MonoScript)> _typesWithMono;
+        private static MonoScript _baseTypeMono;
+        private static FieldInfo _fieldInfo;
+        private static bool _isTypesSetsUp = false;
 
         private void OnEnable()
         {
             _script = (ButtonView)target;
+            GetCommonStaticInfo();
             CreatePopupMenu();
-            _fieldInfo = _script.GetType()
-                .GetField("_buttonHandlers", BindingFlags.Instance | BindingFlags.NonPublic);
             _targetProperty = serializedObject.FindProperty("_buttonHandlers");
             _showContent = EditorPrefs.GetBool(nameof(ButtonViewCustomInspector) + "_" + nameof(_showContent), false);
         }
@@ -130,8 +130,11 @@ namespace Utils.UI.Editor
             }
         }
 
-        private void CreatePopupMenu()
+        private static void CreatePopupMenu()
         {
+            if (_isTypesSetsUp)
+                return;
+
             _typesWithMono ??= new();
             _typesWithMono.Clear();
             _menu = new GenericMenu();
@@ -156,13 +159,27 @@ namespace Utils.UI.Editor
                 _menu.AddItem(new GUIContent(_typesWithMono.ElementAt(i).Item1.Name), false, HandlePopupMenuSelection,
                     i);
             }
+            _isTypesSetsUp = true;
         }
 
-        private void HandlePopupMenuSelection(object parameter)
+        private static void HandlePopupMenuSelection(object parameter)
         {
             int id = (int)parameter;
             List<AbstractButtonHandler> filedData = (List<AbstractButtonHandler>)_fieldInfo.GetValue(_script);
             filedData.Add((AbstractButtonHandler)Activator.CreateInstance(_typesWithMono.ElementAt(id).Item1));
+        }
+        
+        [UnityEditor.Callbacks.DidReloadScripts]
+        private static void OnScriptsReloaded()
+        {
+            _isTypesSetsUp = false;
+            CreatePopupMenu();
+        }
+
+        private static void GetCommonStaticInfo()
+        {
+            _fieldInfo = _script.GetType()
+                .GetField("_buttonHandlers", BindingFlags.Instance | BindingFlags.NonPublic);
         }
     }
 }
