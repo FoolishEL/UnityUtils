@@ -18,9 +18,10 @@ namespace Utils.UI.Editor
         private SerializedProperty _targetProperty;
         private static bool _showContent;
         private GenericMenu _menu;
-        private List<(Type,MonoScript)> _typesWithMono;
+        private List<(Type, MonoScript)> _typesWithMono;
         private MonoScript _baseTypeMono;
         private FieldInfo _fieldInfo;
+
         private void OnEnable()
         {
             _script = (ButtonView)target;
@@ -28,12 +29,12 @@ namespace Utils.UI.Editor
             _fieldInfo = _script.GetType()
                 .GetField("_buttonHandlers", BindingFlags.Instance | BindingFlags.NonPublic);
             _targetProperty = serializedObject.FindProperty("_buttonHandlers");
-            _showContent = EditorPrefs.GetBool(nameof(ButtonViewCustomInspector) + "_" + nameof(_showContent),false);
+            _showContent = EditorPrefs.GetBool(nameof(ButtonViewCustomInspector) + "_" + nameof(_showContent), false);
         }
 
         private void OnDisable()
         {
-            EditorPrefs.SetBool(nameof(ButtonViewCustomInspector) + "_" + nameof(_showContent),_showContent);
+            EditorPrefs.SetBool(nameof(ButtonViewCustomInspector) + "_" + nameof(_showContent), _showContent);
         }
 
         public override void OnInspectorGUI()
@@ -45,35 +46,33 @@ namespace Utils.UI.Editor
             if (_targetProperty is not null && _targetProperty.isArray)
             {
                 _showContent = EditorGUILayout.BeginFoldoutHeaderGroup(_showContent, new GUIContent("Button Handlers"));
+                EditorGUILayout.EndFoldoutHeaderGroup();
                 if (_showContent)
-                {
-                    int elementToDelete = -1;
-                    if (_targetProperty.arraySize != 0)
-                        using (new EditorGUILayout.VerticalScope())
-                        {
-                            for (int i = 0; i < _targetProperty.arraySize; i++)
+                    using (new EditorGUILayout.VerticalScope())
+                    {
+                        int elementToDelete = -1;
+                        if (_targetProperty.arraySize != 0)
+                            using (new EditorGUILayout.VerticalScope())
                             {
-                                using (new EditorGUILayout.HorizontalScope("box"))
+                                for (int i = 0; i < _targetProperty.arraySize; i++)
                                 {
-                                    GUILayout.Space(10f);
-                                    DrawPropertyWithType(_targetProperty.GetArrayElementAtIndex(i));
-                                    GUILayout.Space(10f);
-                                    HandleScriptButton(i);
-                                    if (GUILayout.Button(new GUIContent(EditorGUIUtility.FindTexture("Toolbar Minus")),
-                                            GUILayout.Width(20)))
-                                        elementToDelete = i;
+                                    using (new EditorGUILayout.HorizontalScope("box"))
+                                    {
+                                        GUILayout.Space(10f);
+                                        DrawPropertyWithType(_targetProperty.GetArrayElementAtIndex(i));
+                                        GUILayout.Space(10f);
+                                        HandleScriptButton(i);
+                                        if (GUILayout.Button(
+                                                new GUIContent(EditorGUIUtility.FindTexture("Toolbar Minus")),
+                                                GUILayout.Width(20)))
+                                            elementToDelete = i;
+                                    }
                                 }
                             }
-                        }
-
-
-                    DrawPlusButton();
-
-                    if (elementToDelete != -1)
-                        _targetProperty.DeleteArrayElementAtIndex(elementToDelete);
-                }
-
-                EditorGUILayout.EndFoldoutHeaderGroup();
+                        DrawPlusButton();
+                        if (elementToDelete != -1)
+                            _targetProperty.DeleteArrayElementAtIndex(elementToDelete);
+                    }
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -139,18 +138,23 @@ namespace Utils.UI.Editor
             var monoScripts = new List<MonoScript>();
             monoScripts.AddRange(MonoImporter.GetAllRuntimeMonoScripts());
             _baseTypeMono = monoScripts.First(c => c.GetClass() == typeof(AbstractButtonHandler));
-            foreach (Type type in
-                     Assembly.GetAssembly(typeof(AbstractButtonHandler)).GetTypes()
-                         .Where(myType =>
-                             myType.IsClass && !myType.IsAbstract &&
-                             myType.IsSubclassOf(typeof(AbstractButtonHandler))))
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
             {
-                _typesWithMono.Add((type, monoScripts.FirstOrDefault(c => c.GetClass() == type)));
+                foreach (Type type in
+                         assembly.GetTypes()
+                             .Where(myType =>
+                                 myType.IsClass && !myType.IsAbstract &&
+                                 myType.IsSubclassOf(typeof(AbstractButtonHandler))))
+                {
+                    _typesWithMono.Add((type, monoScripts.FirstOrDefault(c => c.GetClass() == type)));
+                }
             }
 
             for (int i = 0; i < _typesWithMono.Count; i++)
             {
-                _menu.AddItem(new GUIContent(_typesWithMono.ElementAt(i).Item1.Name), false, HandlePopupMenuSelection, i);
+                _menu.AddItem(new GUIContent(_typesWithMono.ElementAt(i).Item1.Name), false, HandlePopupMenuSelection,
+                    i);
             }
         }
 
