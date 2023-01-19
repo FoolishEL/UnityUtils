@@ -71,7 +71,8 @@ namespace Utils.UI
         public virtual void Initialize()
         {
             SetToggleGroup(toggleButtonHandlerGroup, false);
-            toggleButtonHandlerGroup.EnsureValidState();
+            if (toggleButtonHandlerGroup is not null)
+                toggleButtonHandlerGroup.EnsureValidState();
             OnValueChanged(IsOn);
         }
 
