@@ -61,14 +61,14 @@ namespace Utils.UI
 
         private void InternalToggle() => IsOn = !IsOn;
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             SetToggleGroup(null, false);
             if (toggleButtonHandlerGroup != null)
                 toggleButtonHandlerGroup.EnsureValidState();
         }
 
-        public void Initialize()
+        public virtual void Initialize()
         {
             SetToggleGroup(toggleButtonHandlerGroup, false);
             toggleButtonHandlerGroup.EnsureValidState();
