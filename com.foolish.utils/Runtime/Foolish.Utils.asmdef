@@ -1,6 +1,6 @@
 {
     "name": "Utils",
-    "rootNamespace": "Utils",
+    "rootNamespace": "Foolish.Utils",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

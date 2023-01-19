@@ -1,6 +1,6 @@
 using System;
 
-namespace Utils.UI
+namespace Foolish.Utils.UI
 {
     /// <summary>
     /// Base class for handling buttons clicks.

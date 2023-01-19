@@ -1,6 +1,6 @@
 {
     "name": "Utils.Editor",
-    "rootNamespace": "Utils.Editor",
+    "rootNamespace": "Foolish.Utils.Editor",
     "references": [
         "GUID:388b322129c2845caa4e895f1f5ced96"
     ],

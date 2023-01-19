@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils.Common;
+using Foolish.Utils.Common;
 
-namespace Utils.UI
+namespace Foolish.Utils.UI
 {
     /// <summary>
     /// Class for storing different handlers on button clicks. 

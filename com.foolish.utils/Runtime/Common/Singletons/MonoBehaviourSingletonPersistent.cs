@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Utils.Common.Singletons
+namespace Foolish.Utils.Common.Singletons
 {
 	/// <summary>
 	/// Generic Singleton for MonoBehaviour

@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Utils.UI
+namespace Foolish.Utils.UI
 {
     [DisallowMultipleComponent]
     public class ToggleButtonHandlerGroup : UIBehaviour

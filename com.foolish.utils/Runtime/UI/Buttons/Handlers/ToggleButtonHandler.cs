@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Utils.UI
+namespace Foolish.Utils.UI
 {
     [Serializable]
     public class ToggleButtonHandler : AbstractToggleButtonHandler

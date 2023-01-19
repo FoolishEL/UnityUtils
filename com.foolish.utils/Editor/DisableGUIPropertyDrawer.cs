@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Utils.UI.Editor
+namespace Foolish.Utils.UI.Editor
 {
 #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(DisableGUI))]

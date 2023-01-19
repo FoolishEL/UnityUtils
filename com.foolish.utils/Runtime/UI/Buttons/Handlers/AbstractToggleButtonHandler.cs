@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-using Utils.Common;
+using Foolish.Utils.Common;
 
-namespace Utils.UI
+namespace Foolish.Utils.UI
 {
     [Serializable]
     public abstract class AbstractToggleButtonHandler : AbstractButtonHandler,IDisposable,IInitable

@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
-namespace Utils.Editor.Extensions
+namespace Foolish.Utils.Editor.Extensions
 {
     /// <summary>
     /// Class for helpful methods for creating Custom editors. 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Utils
+namespace Foolish.Utils
 {
     public static class SceneReferenceExtensions
     {

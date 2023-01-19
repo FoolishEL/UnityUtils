@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Utils.UI.Editor
+namespace Foolish.Utils.UI.Editor
 {
     using Utils.Editor.Extensions;
     using Editor = UnityEditor.Editor;

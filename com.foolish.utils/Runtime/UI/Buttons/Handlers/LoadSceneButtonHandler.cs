@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Utils.UI
+namespace Foolish.Utils.UI
 {
     [Serializable]
     public class LoadSceneButtonHandler : AbstractButtonHandler

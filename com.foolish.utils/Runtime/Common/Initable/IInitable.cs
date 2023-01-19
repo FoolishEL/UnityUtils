@@ -1,4 +1,4 @@
-namespace Utils.Common
+namespace Foolish.Utils.Common
 {
     public interface IInitable
     {
