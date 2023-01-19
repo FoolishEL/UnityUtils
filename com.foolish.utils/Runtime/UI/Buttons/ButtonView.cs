@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils.Common;
 
 namespace Utils.UI
 {
@@ -29,9 +31,25 @@ namespace Utils.UI
 
         private void Reset() => button = GetComponent<Button>();
 
-        private void Awake() => button.onClick.AddListener(OnButtonClicked);
+        private void Awake()
+        {
+            button.onClick.AddListener(OnButtonClicked);
+            foreach (var buttonHandler  in _buttonHandlers)
+            {
+                if(buttonHandler is IInitable initable)
+                    initable.Initialize();
+            }
+        }
 
-        private void OnDestroy() => button.onClick.AddListener(OnButtonClicked);
+        private void OnDestroy()
+        {
+            button.onClick.AddListener(OnButtonClicked);
+            foreach (var buttonHandler  in _buttonHandlers)
+            {
+                if(buttonHandler is IDisposable disposable)
+                    disposable.Dispose();
+            }
+        }
 
         private void OnButtonClicked() => _buttonHandlers.ForEach(c => c.OnButtonClickedHandler());
     }
