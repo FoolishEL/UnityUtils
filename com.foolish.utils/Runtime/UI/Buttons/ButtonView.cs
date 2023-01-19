@@ -31,7 +31,7 @@ namespace Utils.UI
 
         private void Reset() => button = GetComponent<Button>();
 
-        private void Awake()
+        private void Start()
         {
             button.onClick.AddListener(OnButtonClicked);
             foreach (var buttonHandler  in _buttonHandlers)
