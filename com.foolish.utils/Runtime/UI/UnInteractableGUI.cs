@@ -1,3 +1,3 @@
 using UnityEngine;
 
-public class DisableGUI : PropertyAttribute { }
+public class UnInteractableGUI : PropertyAttribute { }
