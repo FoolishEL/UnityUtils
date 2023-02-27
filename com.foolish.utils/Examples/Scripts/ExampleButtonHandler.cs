@@ -9,7 +9,7 @@ namespace Foolish.Utils.UI
     [Serializable]
     public class ExampleButtonHandler : AbstractButtonHandler
     {
-        [SerializeField, DisableGUI] private string message = "This class is only for test purposes only!";
+        [SerializeField, UnInteractableGUI] private string message = "This class is only for test purposes only!";
         public override void OnButtonClickedHandler()
         {
             Debug.LogError($"{nameof(ExampleButtonHandler)} is handled!");
@@ -22,7 +22,7 @@ namespace Foolish.Utils.UI
     [Serializable]
     public class Example2ButtonHandler : AbstractButtonHandler
     {
-        [SerializeField, DisableGUI] private string message = "This class is only for test purposes only!";
+        [SerializeField, UnInteractableGUI] private string message = "This class is only for test purposes only!";
 
         public override void OnButtonClickedHandler()
         {
