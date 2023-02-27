@@ -43,7 +43,7 @@ namespace Foolish.Utils.UI.Editor
             serializedObject.Update();
             using (new EditorGUI.DisabledScope(true))
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("button"));
-            if (_targetProperty is not null && _targetProperty.isArray)
+            if (!(_targetProperty is null) && _targetProperty.isArray)
             {
                 _showContent = EditorGUILayout.BeginFoldoutHeaderGroup(_showContent, new GUIContent("Button Handlers"));
                 EditorGUILayout.EndFoldoutHeaderGroup();
@@ -69,6 +69,7 @@ namespace Foolish.Utils.UI.Editor
                                     }
                                 }
                             }
+
                         DrawPlusButton();
                         if (elementToDelete != -1)
                             _targetProperty.DeleteArrayElementAtIndex(elementToDelete);
@@ -82,29 +83,34 @@ namespace Foolish.Utils.UI.Editor
         {
             var serializedPropertyElement = _targetProperty.GetArrayElementAtIndex(id);
             (Type, MonoScript) currentElement = default;
+            #if UNITY_2021_1_OR_NEWER
             try
             {
                 currentElement = _typesWithMono.First(c =>
                     c.Item1 == serializedPropertyElement.managedReferenceValue.GetType());
+                
             }
             catch
             {
+            #endif
                 currentElement = (_typesWithMono[id].Item1, _baseTypeMono);
+#if UNITY_2021_1_OR_NEWER
             }
             finally
             {
+#endif
                 if (GUILayout.Button(
-                        new GUIContent(EditorGUIUtility.FindTexture(currentElement.Item2 is not null
+                        new GUIContent(EditorGUIUtility.FindTexture(currentElement.Item2 is {}
                                 ? "cs Script Icon"
                                 : "console.warnicon"),
-                            currentElement.Item2 is not null ? "Ping script" : "MonoScript with this class not found!"),
+                            currentElement.Item2 is {} ? "Ping script" : "MonoScript with this class not found!"),
                         GUILayout.Width(25), GUILayout.Height(20)))
                 {
-                    EditorGUIUtility.PingObject(currentElement.Item2 is not null
-                        ? currentElement.Item2
-                        : _baseTypeMono);
+                    EditorGUIUtility.PingObject(currentElement.Item2 ?? _baseTypeMono);
                 }
+#if UNITY_2021_1_OR_NEWER
             }
+#endif
         }
 
         private void DrawPropertyWithType(SerializedProperty property)
@@ -135,7 +141,7 @@ namespace Foolish.Utils.UI.Editor
             if (_isTypesSetsUp)
                 return;
 
-            _typesWithMono ??= new();
+            _typesWithMono ??= new List<(Type, MonoScript)>();
             _typesWithMono.Clear();
             _menu = new GenericMenu();
             var monoScripts = new List<MonoScript>();
@@ -159,6 +165,7 @@ namespace Foolish.Utils.UI.Editor
                 _menu.AddItem(new GUIContent(_typesWithMono.ElementAt(i).Item1.Name), false, HandlePopupMenuSelection,
                     i);
             }
+
             _isTypesSetsUp = true;
         }
 
@@ -168,7 +175,7 @@ namespace Foolish.Utils.UI.Editor
             List<AbstractButtonHandler> filedData = (List<AbstractButtonHandler>)_fieldInfo.GetValue(_script);
             filedData.Add((AbstractButtonHandler)Activator.CreateInstance(_typesWithMono.ElementAt(id).Item1));
         }
-        
+
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void OnScriptsReloaded()
         {

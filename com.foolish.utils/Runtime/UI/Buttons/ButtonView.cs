@@ -14,13 +14,12 @@ namespace Foolish.Utils.UI
     {
         [SerializeField] private Button button;
 
-        [SerializeReference] private List<AbstractButtonHandler> _buttonHandlers = new();
+        [SerializeReference] private List<AbstractButtonHandler> _buttonHandlers = new List<AbstractButtonHandler>();
 
         private void OnValidate()
         {
             if (button is null)
                 if (TryGetComponent<Button>(out var btn))
-
                     button = btn;
                 else
                 {

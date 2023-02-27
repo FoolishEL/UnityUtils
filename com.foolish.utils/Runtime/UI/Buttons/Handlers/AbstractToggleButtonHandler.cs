@@ -5,25 +5,23 @@ using Foolish.Utils.Common;
 namespace Foolish.Utils.UI
 {
     [Serializable]
-    public abstract class AbstractToggleButtonHandler : AbstractButtonHandler,IDisposable,IInitable
+    public abstract class AbstractToggleButtonHandler : AbstractButtonHandler, IDisposable, IInitable
     {
-        [SerializeField]
-        private ToggleButtonHandlerGroup toggleButtonHandlerGroup;
+        [SerializeField] private ToggleButtonHandlerGroup toggleButtonHandlerGroup;
 
         protected abstract void OnValueChanged(bool status);
-        
-        [Tooltip("Is the toggle currently on or off?")]
-        [SerializeField]
+
+        [Tooltip("Is the toggle currently on or off?")] [SerializeField]
         private bool isOn;
 
         private void SetToggleGroup(ToggleButtonHandlerGroup newGroup, bool setMemberValue)
         {
             if (toggleButtonHandlerGroup != null)
                 toggleButtonHandlerGroup.UnregisterToggle(this);
-            
+
             if (setMemberValue)
                 toggleButtonHandlerGroup = newGroup;
-            
+
             if (newGroup != null)
                 newGroup.RegisterToggle(this);
             if (newGroup != null && IsOn)
@@ -43,7 +41,7 @@ namespace Foolish.Utils.UI
         {
             if (isOn == value)
                 return;
-            
+
             isOn = value;
             if (toggleButtonHandlerGroup != null && toggleButtonHandlerGroup.isActiveAndEnabled)
             {
@@ -53,6 +51,7 @@ namespace Foolish.Utils.UI
                     toggleButtonHandlerGroup.NotifyToggleOn(this, sendCallback);
                 }
             }
+
             if (sendCallback)
             {
                 OnValueChanged(isOn);
@@ -71,7 +70,7 @@ namespace Foolish.Utils.UI
         public virtual void Initialize()
         {
             SetToggleGroup(toggleButtonHandlerGroup, false);
-            if (toggleButtonHandlerGroup is not null)
+            if (toggleButtonHandlerGroup is { })
                 toggleButtonHandlerGroup.EnsureValidState();
             OnValueChanged(IsOn);
         }
