@@ -5,7 +5,7 @@ namespace Foolish.Utils.UI.Editor
 {
 #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(UnInteractableGUI))]
-    public class UnInteractableGUIGUIPropertyDrawer : PropertyDrawer
+    public class UnInteractableGUIPropertyDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

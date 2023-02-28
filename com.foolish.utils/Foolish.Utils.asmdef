@@ -1,8 +1,10 @@
 {
-    "name": "Foolish.Utils.Example",
-    "rootNamespace": "Foolish.Utils.Example",
+    "name": "FoolishUtils",
+    "rootNamespace": "",
     "references": [
-        "GUID:388b322129c2845caa4e895f1f5ced96"
+        "Utils.Editor",
+        "Utils",
+        "Foolish.Utils.Example"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -10,9 +12,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [
-        "UNITY_EDITOR"
-    ],
+    "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
 }

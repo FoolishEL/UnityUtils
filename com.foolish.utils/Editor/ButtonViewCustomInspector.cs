@@ -83,6 +83,8 @@ namespace Foolish.Utils.UI.Editor
         {
             var serializedPropertyElement = _targetProperty.GetArrayElementAtIndex(id);
             (Type, MonoScript) currentElement = default;
+            //TODO: create solution for elder Unity Versions:
+            //REASON: no getter in managedReferenceValue
             #if UNITY_2021_1_OR_NEWER
             try
             {
