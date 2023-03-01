@@ -9,8 +9,7 @@ namespace Foolish.Utils.Common.Singletons
     {
         public static T Instance { get; protected set; }
 
-        [SerializeField]
-        private bool needUnparentSelf = true;
+        [SerializeField] private bool needUnparentSelf = true;
 
         protected virtual void Awake()
         {
@@ -22,6 +21,8 @@ namespace Foolish.Utils.Common.Singletons
             Init();
         }
 
-        protected abstract void Init();
+        protected virtual void Init()
+        {
+        }
     }
 }
