@@ -75,10 +75,8 @@ namespace Foolish.Utils
             }
         }
 
-        public static implicit operator string(SceneReference sceneReference)
-        {
-            return sceneReference.ScenePath;
-        }
+        public static implicit operator string(SceneReference sceneReference) =>
+            System.IO.Path.GetFileNameWithoutExtension(sceneReference.ScenePath);
 
         // Called to prepare this data for serialization. Stubbed out when not in editor.
         public void OnBeforeSerialize()
