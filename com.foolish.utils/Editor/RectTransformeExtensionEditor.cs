@@ -64,13 +64,13 @@ namespace Foolish.Utils.Editor
             EditorGUILayout.EndHorizontal();
         }
 
-        private void FitInAnchors()
+        void FitInAnchors()
         {
             rTransform.offsetMax = Vector2.zero;
             rTransform.offsetMin = Vector2.zero;
         }
 
-        private void CalculateCustomAnchors(RectTransform parent)
+        void CalculateCustomAnchors(RectTransform parent)
         {
             var rect = parent.rect;
             var rightAnchorOffset = rect.width * (1 - rTransform.anchorMax.x);
@@ -94,11 +94,11 @@ namespace Foolish.Utils.Editor
             rTransform.offsetMin = Vector2.zero;
         }
 
-        private void MirrorVertical() => RawMirror(false, true);
+        void MirrorVertical() => RawMirror(false, true);
 
-        private void MirrorHorizontal() => RawMirror(true, false);
+        void MirrorHorizontal() => RawMirror(true, false);
 
-        private void RawMirror(bool isHorizontal, bool isVertical)
+        void RawMirror(bool isHorizontal, bool isVertical)
         {
             var pivot = rTransform.pivot;
             rTransform.pivot = Vector2.one * .5f;
@@ -122,9 +122,9 @@ namespace Foolish.Utils.Editor
                 new Vector2(isHorizontal ? pivot.x : 1f - pivot.x, isHorizontal ? 1f - pivot.y : pivot.y);
         }
 
-        private List<KeyValuePair<bool, Behaviour>> _layoutComponents = new List<KeyValuePair<bool, Behaviour>>();
+        List<KeyValuePair<bool, Behaviour>> _layoutComponents = new List<KeyValuePair<bool, Behaviour>>();
 
-        private void SetLayoutElements()
+        void SetLayoutElements()
         {
             _layoutComponents!.Clear();
             if (rTransform.TryGetComponent<AspectRatioFitter>(out var aspectRatioFitter))
@@ -140,9 +140,9 @@ namespace Foolish.Utils.Editor
             }
         }
 
-        private void UnsetLayoutElements() => _layoutComponents.ForEach(c => c.Value.enabled = c.Key);
+        void UnsetLayoutElements() => _layoutComponents.ForEach(c => c.Value.enabled = c.Key);
 
-        private void FitInParent()
+        void FitInParent()
         {
             rTransform.anchorMax = Vector2.one;
             rTransform.anchorMin = Vector2.zero;

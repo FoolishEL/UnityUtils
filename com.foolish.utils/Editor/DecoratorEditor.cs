@@ -10,27 +10,27 @@ using UnityEngine;
 public abstract class DecoratorEditor : Editor
 {
 	// empty array for invoking methods using reflection
-	private static readonly object[] EMPTY_ARRAY = new object[0];
+	static readonly object[] EMPTY_ARRAY = new object[0];
 	
 	#region Editor Fields
 	
 	/// <summary>
 	/// Type object for the internally used (decorated) editor.
 	/// </summary>
-	private System.Type decoratedEditorType;
+	System.Type decoratedEditorType;
 	
 	/// <summary>
 	/// Type object for the object that is edited by this editor.
 	/// </summary>
-	private System.Type editedObjectType;
-	
-	private Editor editorInstance;
+	System.Type editedObjectType;
+
+	Editor editorInstance;
 	
 	#endregion
 
-	private static Dictionary<string, MethodInfo> decoratedMethods = new Dictionary<string, MethodInfo>();
-	
-	private static Assembly editorAssembly = Assembly.GetAssembly(typeof(Editor));
+	static Dictionary<string, MethodInfo> decoratedMethods = new Dictionary<string, MethodInfo>();
+
+	static Assembly editorAssembly = Assembly.GetAssembly(typeof(Editor));
 	
 	protected Editor EditorInstance
 	{
@@ -66,8 +66,8 @@ public abstract class DecoratorEditor : Editor
 			              editedObjectType, editorTypeName, originalEditedType));
 		}
 	}
-	
-	private System.Type GetCustomEditorType(System.Type type)
+
+	System.Type GetCustomEditorType(System.Type type)
 	{
 		var flags = BindingFlags.NonPublic	| BindingFlags.Instance;
 		
@@ -76,8 +76,8 @@ public abstract class DecoratorEditor : Editor
 		
 		return field.GetValue(attributes[0]) as System.Type;
 	}
-	
-	private void Init()
+
+	void Init()
 	{		
 		var flags = BindingFlags.NonPublic	| BindingFlags.Instance;
 		
