@@ -27,7 +27,7 @@ namespace Foolish.Utils.Editor.Windows
                 if (!TryLoadSettingsInternal())
                 {
                     GetWindow<WindowsSettingsInitializeWindow>("Initialize Settings");
-                    Close();
+                    EditorApplication.delayCall += Close;
                     return;
                 }
             }
@@ -71,7 +71,10 @@ namespace Foolish.Utils.Editor.Windows
             {
                 GetWindow<WindowsSettingsInitializeWindow>("Initialize Settings");
             }
-            if (GUILayout.Button("Close"))
+            if (GUILayout.Button("Check asset in project"))
+            {
+                TryLoadSettingsInternal();
+            }
         }
 
         void IHasCustomMenu.AddItemsToMenu(GenericMenu menu) => AddItemsToMenu(menu);
