@@ -131,15 +131,16 @@ namespace Foolish.Utils.Editor.Windows
 
         List<Texture2D> texturesToMerge = new();
         bool mergeHorizontally = true;
-        string namePattern = "{0}_all";
         bool destroyAfterMerge;
         bool enableSizeCheck = true;
+        bool customSavePath;
+        string customSavePathValue;
 
         Vector2 scrollPosition = Vector2.zero;
 
         void DrawMergeWindow()
         {
-            GUILayout.Label("Merge texturesToMerge", EditorStyles.boldLabel);
+            GUILayout.Label("Merge textures", EditorStyles.boldLabel);
 
             using (new EditorGUILayout.VerticalScope("Box"))
             {
@@ -178,10 +179,20 @@ namespace Foolish.Utils.Editor.Windows
 
             enableSizeCheck = EditorGUILayout.Toggle("Enable texture size check", enableSizeCheck);
             mergeHorizontally = EditorGUILayout.Toggle("Merge Horizontally", mergeHorizontally);
-            namePattern = EditorGUILayout.TextField("Pattern", namePattern);
             destroyAfterMerge = EditorGUILayout.Toggle("Delete initial image", destroyAfterMerge);
+            var startValue = customSavePath;
+            
+            customSavePath  = EditorGUILayout.Toggle("Use custom save path ", customSavePath);
+            if (customSavePath && startValue != customSavePath)
+            {
+                customSavePathValue = Path.GetDirectoryName(AssetDatabase.GetAssetPath(texturesToMerge[0]));
+            }
+            if (customSavePath)
+            {
+                customSavePathValue = EditorGUILayout.TextField("Custom save path", customSavePathValue);
+            }
 
-            if (GUILayout.Button("Merge texturesToMerge"))
+            if (GUILayout.Button("Merge textures"))
             {
                 MergeTextures();
             }
@@ -209,16 +220,11 @@ namespace Foolish.Utils.Editor.Windows
             }
 
             string directory = Path.GetDirectoryName(AssetDatabase.GetAssetPath(texturesToMerge[0]));
-            string combinedTextureName;
-            try
+            if (customSavePath)
             {
-                combinedTextureName = $"{string.Format(namePattern, texturesToMerge[0].name)}.png";
+                directory = customSavePathValue;
             }
-            catch
-            {
-                combinedTextureName = $"{texturesToMerge[0].name}_combined.png";
-                namePattern = "{0}_combined";
-            }
+            string combinedTextureName = $"{texturesToMerge[0].name}_combined.png";
 
             var combinedTexture = texturesToMerge[0];
             for (int i = 1; i < texturesToMerge.Count; i++)
@@ -227,18 +233,77 @@ namespace Foolish.Utils.Editor.Windows
             }
 
             byte[] bytes = combinedTexture.EncodeToPNG();
-            File.WriteAllBytes(Path.Combine(directory!, combinedTextureName), bytes);
-            if (destroyAfterMerge)
+            var totalPath = Path.Combine(directory!, combinedTextureName);
+            if (ValidatePathAndEnsureDirectories(totalPath, out totalPath))
             {
-                foreach (var texture in texturesToMerge)
+                File.WriteAllBytes(totalPath, bytes);
+                if (destroyAfterMerge)
                 {
-                    AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(texture));
+                    foreach (var texture in texturesToMerge)
+                    {
+                        AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(texture));
+                    }
                 }
+
+                AssetDatabase.Refresh();
+                Debug.Log($"texturesToMerge merged and saved at: {directory}/{combinedTextureName}");
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("Error while saving image", "Please check your path and try again", "Ok");
+            }
+        }
+        
+        bool ValidatePathAndEnsureDirectories(string inputPath, out string validatedPath)
+        {
+            validatedPath = string.Empty;
+            
+            if (string.IsNullOrEmpty(inputPath))
+            {
+                EditorUtility.DisplayDialog("Error while saving image", "Path cannot be empty.", "Ok");
+                return false;
+            }
+            
+            string fullPath = Path.GetFullPath(inputPath);
+            
+            string assetsFolderFullPath = Path.GetFullPath(Application.dataPath);
+            
+            if (!fullPath.StartsWith(assetsFolderFullPath))
+            {
+                EditorUtility.DisplayDialog("Error while saving image", "Path must be inside Assets folder.", "Ok");
+                return false;
+            }
+            
+            validatedPath = "Assets" + fullPath.Substring(assetsFolderFullPath.Length);
+            
+            string directoryPath = Path.GetDirectoryName(validatedPath);
+            if (!string.IsNullOrEmpty(directoryPath) && !AssetDatabase.IsValidFolder(directoryPath))
+            {
+                CreateFolders(directoryPath);
+            }
+
+            return true;
+        }
+
+        void CreateFolders(string path)
+        {
+            string[] folders = path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string parentPath = "Assets";
+
+            for (int i = 1; i < folders.Length; i++)
+            {
+                string currentFolder = string.Join("/", folders, 0, i + 1);
+                if (!AssetDatabase.IsValidFolder(currentFolder))
+                {
+                    AssetDatabase.CreateFolder(parentPath, folders[i]);
+                }
+
+                parentPath = currentFolder;
             }
 
             AssetDatabase.Refresh();
-            Debug.Log($"texturesToMerge merged and saved at: {directory}/{combinedTextureName}");
         }
+
 
         bool CheckSizes(Texture2D[] textures)
         {
@@ -283,6 +348,14 @@ namespace Foolish.Utils.Editor.Windows
 
         Color[] Merge(Texture2D texture1, Texture2D texture2)
         {
+            if (!texture1.isReadable)
+            {
+                texture1 = ReadTextureData(texture1);
+            }
+            if (!texture2.isReadable)
+            {
+                texture2 = ReadTextureData(texture2);
+            }
             Color[] pixels1 = texture1.GetPixels();
             Color[] pixels2 = texture2.GetPixels();
 
@@ -332,6 +405,27 @@ namespace Foolish.Utils.Editor.Windows
                 return result;
             }
         }
+        
+        Texture2D ReadTextureData(Texture2D originalTexture)
+        {
+            RenderTexture tempRenderTexture = RenderTexture.GetTemporary(
+                originalTexture.width, originalTexture.height, 0,
+                RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
+
+            Graphics.Blit(originalTexture, tempRenderTexture);
+
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = tempRenderTexture;
+
+            Texture2D readableTexture = new Texture2D(originalTexture.width, originalTexture.height);
+            readableTexture.ReadPixels(new Rect(0, 0, tempRenderTexture.width, tempRenderTexture.height), 0, 0);
+            readableTexture.Apply();
+
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(tempRenderTexture);
+
+            return readableTexture;
+        } 
 
         #endregion
 
