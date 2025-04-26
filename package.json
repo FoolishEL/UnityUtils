@@ -1,7 +1,7 @@
 {
     "name": "com.foolish.utils",
     "displayName": "FoolishEL Utils package",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "author": "Foolish ELEPHANT",
     "description": "Utilities for Unity Games",
     "dependencies": {
