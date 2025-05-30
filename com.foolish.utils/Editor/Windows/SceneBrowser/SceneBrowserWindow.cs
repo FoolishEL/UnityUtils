@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Foolish.Utils.Editor.Windows
 {
@@ -56,7 +57,7 @@ namespace Foolish.Utils.Editor.Windows
             EditorApplication.playModeStateChanged -= OnPlayMode;
             SaveData();
         }
-        
+
         void OnPlayMode(PlayModeStateChange change)
         {
             if (change == PlayModeStateChange.EnteredPlayMode)
@@ -77,12 +78,20 @@ namespace Foolish.Utils.Editor.Windows
             bool isHorizontal = currentSize.x > 300;
             Action<string, float> drawMethode = isHorizontal ? DrawSceneNormal : DrawNarrow;
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+
+			var currentScenePath = SceneManager.GetActiveScene().path;
+
             foreach (var scene in scenes)
             {
                 if (scene is null)
                     continue;
                 var path = scene.path;
+				if (currentScenePath == path)
+				{
+					GUI.color = Color.yellow;
+				}
                 drawMethode(path, currentSize.x);
+				GUI.color = Color.white;
             }
             if (externalScenesPaths.Count > 0)
             {
@@ -91,9 +100,15 @@ namespace Foolish.Utils.Editor.Windows
                 EditorGUILayout.Space();
             }
 
+
             foreach (var scenePath in externalScenesPaths)
             {
+				if (currentScenePath == scenePath)
+				{
+					GUI.color = Color.yellow;
+				}
                 drawMethode(scenePath, currentSize.x);
+				GUI.color = Color.white;
             }
 
             GUILayout.EndScrollView();
@@ -122,7 +137,7 @@ namespace Foolish.Utils.Editor.Windows
 
             if (GUILayout.Button("Play", GUILayout.Width(100)) && !isLocked)
             {
-                previousScenePath = EditorSceneManager.GetActiveScene().path;
+                previousScenePath = SceneManager.GetActiveScene().path;
                 shouldReturnToPreviousScene = true;
                 if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                 {
@@ -130,6 +145,10 @@ namespace Foolish.Utils.Editor.Windows
                     EditorApplication.isPlaying = true;
                 }
             }
+			if (GUILayout.Button("S", GUILayout.Width(25)) && !isLocked)
+			{
+				ShowAndPingObjectByPath(scenePath);
+			}
             if (isLocked)
             {
                 GUI.enabled = true;
@@ -137,6 +156,20 @@ namespace Foolish.Utils.Editor.Windows
 
             GUILayout.EndHorizontal();
         }
+
+		void ShowAndPingObjectByPath(string path)
+		{
+			var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+			if (asset)
+			{
+				EditorGUIUtility.PingObject(asset);
+				Selection.activeObject = asset;
+			}
+			else
+			{
+				Debug.LogWarning($"Could not find or load asset at path: {path}");
+			}
+		}
 
         void DrawNarrow(string scenePath, float maxWidth)
         {
@@ -165,7 +198,7 @@ namespace Foolish.Utils.Editor.Windows
 
             if (GUILayout.Button("Play", GUILayout.Width(100)) && !isLocked)
             {
-                previousScenePath = EditorSceneManager.GetActiveScene().path;
+                previousScenePath = SceneManager.GetActiveScene().path;
                 shouldReturnToPreviousScene = true;
                 if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                 {
