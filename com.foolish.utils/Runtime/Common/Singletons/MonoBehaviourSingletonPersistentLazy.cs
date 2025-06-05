@@ -15,7 +15,7 @@ namespace Foolish.Utils.Common.Singletons
             {
                 if (instance == null)
                 {
-                    instance = new GameObject(instance.GetType().Name).AddComponent<T>();
+                    instance = new GameObject(typeof(T).Name).AddComponent<T>();
                     DontDestroyOnLoad(instance);
                     (instance as MonoBehaviourSingletonPersistentLazy<T>).Init();
                 }
