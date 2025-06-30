@@ -17,7 +17,8 @@ namespace Foolish.Utils.Editor.Windows
             Selection,
             Slicer,
             Merger,
-            Packer
+            Packer,
+            Transparency
         }
 
         [MenuItem("Tools/Developer/TextureUtilities")]
@@ -52,6 +53,9 @@ namespace Foolish.Utils.Editor.Windows
                 case WindowType.Packer:
                     DrawTexturePackerWindow();
                     return;
+                case WindowType.Transparency:
+                    DrawTextureTransparencyWindow();
+                    return;
                 default:
                     DrawSelectionWindow();
                     break;
@@ -75,6 +79,11 @@ namespace Foolish.Utils.Editor.Windows
             if (GUILayout.Button("Pack textures into Texture2DArray"))
             {
                 windowType = WindowType.Packer;
+            }
+            
+            if (GUILayout.Button("Add alpha to texture edges"))
+            {
+                windowType = WindowType.Transparency;
             }
         }
 
@@ -520,5 +529,127 @@ namespace Foolish.Utils.Editor.Windows
 
         #endregion
 
+        #region Texture Transparency
+        
+        private Texture2D selectedTextureTransparency;
+        private int leftPixels = 10;
+        private int rightPixels = 10;
+        private int topPixels = 0;
+        private int bottomPixels = 0;
+        private bool preserveReadable = true;
+        
+        private void DrawTextureTransparencyWindow()
+		{
+			GUILayout.Label("Add Transparency to Texture Edges", EditorStyles.boldLabel);
+
+            selectedTextureTransparency =
+				(Texture2D)EditorGUILayout.ObjectField("Texture", selectedTextureTransparency, typeof(Texture2D), false);
+
+			EditorGUILayout.Space();
+			GUILayout.Label("Horizontal Padding", EditorStyles.boldLabel);
+			leftPixels = EditorGUILayout.IntField("Left Transparent Pixels", leftPixels);
+			rightPixels = EditorGUILayout.IntField("Right Transparent Pixels", rightPixels);
+
+			EditorGUILayout.Space();
+			GUILayout.Label("Vertical Padding", EditorStyles.boldLabel);
+			topPixels = EditorGUILayout.IntField("Top Transparent Pixels", topPixels);
+			bottomPixels = EditorGUILayout.IntField("Bottom Transparent Pixels", bottomPixels);
+
+			EditorGUILayout.Space();
+			preserveReadable = EditorGUILayout.Toggle("Preserve Readable", preserveReadable);
+            using (new GUILayout.HorizontalScope())
+            {
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Process Texture",GUILayout.MaxWidth(300)) && selectedTextureTransparency != null)
+                {
+                    ProcessTexture();
+                }   
+                GUILayout.FlexibleSpace();
+            }
+		}
+
+		private void ProcessTexture()
+		{
+			if (selectedTextureTransparency == null)
+			{
+				Debug.LogError("No texture selected!");
+				return;
+			}
+
+			var path = AssetDatabase.GetAssetPath(selectedTextureTransparency);
+			if (string.IsNullOrEmpty(path))
+			{
+				Debug.LogError("Could not get asset path for the selected texture.");
+				return;
+			}
+
+			var wasReadable = true;
+			var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+			if (importer != null)
+			{
+				wasReadable = importer.isReadable;
+				if (!wasReadable && preserveReadable)
+				{
+					importer.isReadable = true;
+					AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+				}
+			}
+
+			try
+			{
+				var originalTexture = new Texture2D(2, 2);
+				var fileData = File.ReadAllBytes(path);
+				originalTexture.LoadImage(fileData);
+
+				var newWidth = originalTexture.width + leftPixels + rightPixels;
+				var newHeight = originalTexture.height + topPixels + bottomPixels;
+
+				var newTexture = new Texture2D(newWidth, newHeight, TextureFormat.RGBA32, false);
+				var transparentPixels = new Color[newWidth * newHeight];
+				for (var i = 0; i < transparentPixels.Length; i++)
+				{
+					transparentPixels[i] = Color.clear;
+				}
+				newTexture.SetPixels(transparentPixels);
+
+				for (var y = 0; y < originalTexture.height; y++)
+				{
+					for (var x = 0; x < originalTexture.width; x++)
+					{
+						var pixel = originalTexture.GetPixel(x, y);
+						newTexture.SetPixel(x + leftPixels, y + bottomPixels, pixel);
+					}
+				}
+
+				newTexture.Apply();
+
+				var bytes = newTexture.EncodeToPNG();
+				File.WriteAllBytes(path, bytes);
+				AssetDatabase.Refresh();
+
+				Debug.Log($"Texture processed successfully: {path}\n" +
+						  $"New size: {newWidth}x{newHeight} " +
+						  $"(added {leftPixels} left, {rightPixels} right, " +
+						  $"{topPixels} top, {bottomPixels} bottom)");
+
+				if (importer != null && !wasReadable && preserveReadable)
+				{
+					importer.isReadable = false;
+					AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+				}
+			}
+			catch (System.Exception e)
+			{
+				Debug.LogError("Error processing texture: " + e.Message);
+
+				if (importer != null && !wasReadable && preserveReadable)
+				{
+					importer.isReadable = false;
+					AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+				}
+			}
+		}
+
+        #endregion
     }
 }
