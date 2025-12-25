@@ -26,7 +26,7 @@ namespace Foolish.Utils.Editor.Windows
         string renameGroupName = "";
         string groupToRename = "";
 
-        [MenuItem("Tools/Developer/Bookmark Window Browser")]
+        [MenuItem("Tools/Developer/Bookmark Window Browser",priority = 0)]
         public static void ShowWindow()
         {
             GetWindow<BookmarkWindowBrowser>("Bookmarks");

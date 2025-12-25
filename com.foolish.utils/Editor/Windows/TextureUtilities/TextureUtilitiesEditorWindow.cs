@@ -21,7 +21,7 @@ namespace Foolish.Utils.Editor.Windows
             Transparency
         }
 
-        [MenuItem("Tools/Developer/TextureUtilities")]
+        [MenuItem("Tools/Developer/TextureUtilities",priority = 100)]
         public static void ShowWindow()
         {
             GetWindow<TextureUtilitiesEditorWindow>("TextureUtilities");
