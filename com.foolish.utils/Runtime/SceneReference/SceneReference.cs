@@ -267,14 +267,14 @@ namespace Foolish.Utils
             // Missing from build scenes
             if (buildScene.buildIndex == -1)
             {
-                iconContent = EditorGUIUtility.IconContent("d_winbtn_mac_close");
+                iconContent = EditorGUIUtility.IconContent("lightmeter/redlight");
                 labelContent.text = "NOT In Build";
                 labelContent.tooltip = "This scene is NOT in build settings.\nIt will be NOT included in builds.";
             }
             // In build scenes and enabled
             else if (buildScene.scene.enabled)
             {
-                iconContent = EditorGUIUtility.IconContent("d_winbtn_mac_max");
+                iconContent = EditorGUIUtility.IconContent("lightmeter/d_greenlight");
                 labelContent.text = "BuildIndex: " + buildScene.buildIndex;
                 labelContent.tooltip = "This scene is in build settings and ENABLED.\nIt will be included in builds." +
                                        readOnlyWarning;
@@ -282,7 +282,7 @@ namespace Foolish.Utils
             // In build scenes and disabled
             else
             {
-                iconContent = EditorGUIUtility.IconContent("d_winbtn_mac_min");
+                iconContent = EditorGUIUtility.IconContent("lightmeter/d_orangelight");
                 labelContent.text = "BuildIndex: " + buildScene.buildIndex;
                 labelContent.tooltip =
                     "This scene is in build settings and DISABLED.\nIt will be NOT included in builds.";
