@@ -1,13 +1,21 @@
 {
     "name": "com.foolish.utils",
-    "displayName": "FoolishEL Utils package",
-    "version": "0.1.2",
+    "displayName": "FoolishEL Utils",
+    "version": "0.1.3",
     "author": "Foolish ELEPHANT",
     "description": "Utilities for Unity Games",
+    "unity": "2022.3",
     "dependencies": {
     },
     "repository": {
         "type": "git",
         "url": "https://github.com/FoolishEL/UnityUtils.git"
-    }
+    },
+    "samples": [
+        {
+            "displayName": "Button Handler Example",
+            "description": "ButtonHandler Example - A simple demonstration of clicks, events, and button states",
+            "path": "Samples/ButtonHandler"
+        }
+    ]
 }
