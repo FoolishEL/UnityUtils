@@ -1,7 +1,7 @@
 {
     "name": "com.foolish.utils",
     "displayName": "FoolishEL Utils",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "author": "Foolish ELEPHANT",
     "description": "Utilities for Unity Games",
     "unity": "2022.3",
