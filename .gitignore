@@ -1,0 +1,16 @@
+# Игнорируем симлинк (или папку Samples, если когда-то переименуешь обратно)
+
+# Стандартный Unity + общие игноры
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+*.csproj
+*.sln
+*.suo
+*.unityproj
+.DS_Store
+!Samples~
