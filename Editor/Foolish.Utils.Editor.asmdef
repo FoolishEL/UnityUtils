@@ -15,6 +15,12 @@
     "defineConstraints": [
         "UNITY_EDITOR"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.ai.navigation",
+            "expression": "",
+            "define": "UNITY_AI_NAVIGATION"
+        }
+    ],
     "noEngineReferences": false
 }
