@@ -52,14 +52,7 @@ namespace Foolish.Utils.Editor
                     instanceName = instanceName.Substring(lastSlash + 1);
                 isNone = false;
             }
-            if (!isNone)
-            {
-                EditorGUI.LabelField(labelRect, instanceName);
-            }
-            else
-            {
-                buttonRect = position;
-            }
+            EditorGUI.LabelField(labelRect, label);
             if (GUI.Button(buttonRect, new GUIContent(isNone ? "Select type" : "Change type", EditorGUIUtility.IconContent("overlays/d_searchoverlay@2x").image)))
             {
                 var menu = new GenericMenu();
@@ -94,7 +87,7 @@ namespace Foolish.Utils.Editor
                 contentRect.x += 2;
                 contentRect.width -= 4;
 
-                EditorGUI.PropertyField(contentRect, property, GUIContent.none, true);
+                EditorGUI.PropertyField(contentRect, property, new(instanceName), true);
             }
         }
 
