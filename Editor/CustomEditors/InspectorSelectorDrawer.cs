@@ -22,7 +22,7 @@ namespace Foolish.Utils.Editor
                 return;
             }
             var derivedTypes = TypesCache.GetDerivedTypes(abstractType)
-                .Where(t => !t.IsAbstract && !t.IsInterface && !t.IsGenericTypeDefinition && !t.ContainsGenericParameters)
+                .Where(t => !t.IsAbstract && !t.IsInterface && !t.IsGenericTypeDefinition && !t.ContainsGenericParameters && !typeof(UnityEngine.Object).IsAssignableFrom(t))
                 .ToArray();
 
             var typeNames = derivedTypes
