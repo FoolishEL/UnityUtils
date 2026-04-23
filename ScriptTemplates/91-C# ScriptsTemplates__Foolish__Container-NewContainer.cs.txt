@@ -1,0 +1,28 @@
+using Foolish.Utils.Containers;
+using UnityEngine;
+
+#ROOTNAMESPACEBEGIN#
+
+    public class #SCRIPTNAME#: AbstractContainer<#SCRIPTNAME#Data>
+    {
+    }
+    
+    public class #SCRIPTNAME#Data : ScriptableObject
+    {
+    
+    }
+
+#if UNITY_EDITOR
+    namespace Editor
+    {
+        [UnityEditor.CustomEditor(typeof(#SCRIPTNAME#))]
+        public class #SCRIPTNAME#Editor : Foolish.Utils.Containers.Editor.AbstractContainerCustomEditor<#SCRIPTNAME#, #SCRIPTNAME#Data>
+        {
+
+            protected override bool AllowSameContainersType => true;
+        }
+    }
+    
+#endif
+
+#ROOTNAMESPACEEND#

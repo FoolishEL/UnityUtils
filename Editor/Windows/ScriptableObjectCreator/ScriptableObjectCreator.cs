@@ -67,13 +67,17 @@ namespace Foolish.Utils.Editor.Windows
             scriptableObjectTypes = new(
                 AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(assembly => assembly.GetTypes())
-                    .Where(t => t.IsClass &&
-                                typeof(ScriptableObject).IsAssignableFrom(t) &&
-                                !typeof(EditorWindow).IsAssignableFrom(t) &&
-                                !typeof(UnityEditor.Editor).IsAssignableFrom(t))
+                    .Where(isValidType)
             );
             window.UpdateIgnoredNameSpaces();
             window.UpdateFilteredTypes();
+
+            bool isValidType(Type type) => 
+                type.IsClass && 
+                typeof(ScriptableObject).IsAssignableFrom(type) && 
+                !typeof(EditorWindow).IsAssignableFrom(type) &&
+                !typeof(UnityEditor.Editor).IsAssignableFrom(type) &&
+                !type.IsAbstract && !type.ContainsGenericParameters;
         }
 
         protected override void OnEnableInternal()
@@ -361,7 +365,7 @@ namespace Foolish.Utils.Editor.Windows
                 if (GUILayout.Button("Reset to Default"))
                 {
                     ignoredNamespaces = new()
-                        { "Unity", "UnityEditor" };
+                        { "Unity", "UnityEditor", "Rider", "Foolish.Utils.Editor" };
                 }
 
                 if (GUILayout.Button("Cancel"))
