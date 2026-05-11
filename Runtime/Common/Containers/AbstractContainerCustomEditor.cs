@@ -154,7 +154,13 @@ namespace Foolish.Utils.Containers.Editor
             return box;
         }
 
-        private void StartRename(TV item) => new EditorWindowRename(item, this).ShowUtility();
+        private void StartRename(TV item)
+        {
+            var renameInspector = CreateInstance<EditorWindowRename>();
+            renameInspector.Initialize(item,this);
+            renameInspector.ShowUtility();
+            
+        }
 
         private void DeleteItem(TV item)
         {
@@ -277,49 +283,6 @@ namespace Foolish.Utils.Containers.Editor
             ve.style.paddingBottom = paddings;
 
         }
-
-        #region Helpers
-
-        private class EditorWindowRename : EditorWindow
-        {
-            private TV item;
-            private IRebuilder editor;
-            private string newName;
-
-            public EditorWindowRename(TV item, IRebuilder editor)
-            {
-                this.item = item;
-                this.editor = editor;
-                newName = item.name;
-            }
-
-            private void OnGUI()
-            {
-                newName = EditorGUILayout.TextField("Name", newName);
-
-                GUILayout.BeginHorizontal();
-
-                if (GUILayout.Button("Save"))
-                {
-                    item.name = newName;
-                    EditorUtility.SetDirty(item);
-                    AssetDatabase.SaveAssets();
-
-                    editor.Rebuild();
-                    Close();
-                }
-
-                if (GUILayout.Button("Cancel"))
-                {
-                    Close();
-                }
-
-                GUILayout.EndHorizontal();
-            }
-        }
-
-        #endregion
-
     }
     
     public interface IRebuilder
