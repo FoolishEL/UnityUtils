@@ -166,7 +166,11 @@ namespace Foolish.Utils.Editor.Windows
                     {
                         previewScrollPos = EditorGUILayout.BeginScrollView(previewScrollPos);
                         {
+#if UNITY_6000_3_OR_NEWER
+                            UnityEditor.Editor.CreateCachedEditor(previewObject,null,ref previewEditor);
+#else
                             previewEditor = UnityEditor.Editor.CreateEditor(previewObject);
+#endif
                             previewEditor?.OnInspectorGUI();
                         }
                         EditorGUILayout.EndScrollView();
@@ -194,7 +198,7 @@ namespace Foolish.Utils.Editor.Windows
         private void UpdateIgnoredNameSpaces()
         {
             ignoredNamespaces.Clear();
-            if (EditorPrefs.HasKey(EDITOR_PREFS_PATH_IGNORED_NAMESPACES_FORMATED) && false)
+            if (EditorPrefs.HasKey(EDITOR_PREFS_PATH_IGNORED_NAMESPACES_FORMATED))
             {
                 var namespacesString = EditorPrefs.GetString(EDITOR_PREFS_PATH_IGNORED_NAMESPACES_FORMATED);
                 var namespacesArray = namespacesString.Split(new[] { '+' }, StringSplitOptions.RemoveEmptyEntries);
