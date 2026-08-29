@@ -21,17 +21,23 @@ namespace Foolish.Utils.Editor.Windows
 
         void OnGUI()
         {
-            Rect dropArea = GUILayoutUtility.GetRect(0, 50, GUILayout.ExpandWidth(true));
-            GUI.Box(dropArea, "Drop scenes here", EditorStyles.helpBox);
+            EditorWindowUI.BeginPage();
+            EditorWindowUI.Header("External Scenes", "Add scenes that are not included in Build Settings.");
+            Rect dropArea = EditorWindowUI.DropArea("Drop scenes here", "Only .unity assets are accepted");
 
             HandleDragAndDrop(dropArea);
 
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+            if (externalScenes.Count == 0)
+            {
+                EditorGUILayout.HelpBox("No external scenes added yet.", MessageType.Info);
+            }
             for (int i = externalScenes.Count - 1; i >= 0; i--)
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(externalScenes[i]);
-                if (GUILayout.Button("X", GUILayout.Width(20)))
+                GUILayout.BeginHorizontal(EditorStyles.helpBox);
+                GUILayout.Label(System.IO.Path.GetFileNameWithoutExtension(externalScenes[i]), EditorStyles.boldLabel);
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Remove", EditorStyles.miniButton, GUILayout.Width(60)))
                 {
                     externalScenes.RemoveAt(i);
                     onScenesModified.Invoke(externalScenes);
@@ -39,6 +45,7 @@ namespace Foolish.Utils.Editor.Windows
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndScrollView();
+            EditorWindowUI.EndPage();
         }
 
         void HandleDragAndDrop(Rect dropArea)

@@ -17,9 +17,11 @@ namespace Foolish.Utils.Editor.Windows
 
         void OnGUI()
         {
-            GUILayout.Label("Initialize Windows Settings", EditorStyles.boldLabel);
+            EditorWindowUI.BeginPage();
+            EditorWindowUI.Header("Initialize Windows Settings",
+                "Create the shared settings asset used by the developer tools.");
 
-            if (GUILayout.Button("Create Settings Asset"))
+            if (EditorWindowUI.PrimaryButton("Create Settings Asset", GUILayout.Height(30)))
             {
                 string path = EditorUtility.SaveFilePanelInProject(
                     "Save Windows Settings Asset",
@@ -42,10 +44,12 @@ namespace Foolish.Utils.Editor.Windows
                 }
             }
 
+            GUILayout.Space(4);
             if (GUILayout.Button("Close"))
             {
                 Close();
             }
+            EditorWindowUI.EndPage();
         }
     }
 }

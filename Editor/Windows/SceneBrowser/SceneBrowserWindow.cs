@@ -72,7 +72,10 @@ namespace Foolish.Utils.Editor.Windows
 
         protected override void OnGUIInternal()
         {
-            GUILayout.Label("Scenes in Build Settings", EditorStyles.boldLabel);
+            EditorWindowUI.BeginPage();
+            EditorWindowUI.Header("Scene Browser", isLocked
+                ? "Scene switching is disabled while Play Mode is active."
+                : "Open, locate, or start Play Mode from any registered scene.");
             EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
             Vector2 currentSize = position.size;
             bool isHorizontal = currentSize.x > 300;
@@ -80,6 +83,8 @@ namespace Foolish.Utils.Editor.Windows
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
 
 			var currentScenePath = SceneManager.GetActiveScene().path;
+
+            EditorWindowUI.Section($"Build Settings  ({scenes.Length})");
 
             foreach (var scene in scenes)
             {
@@ -95,9 +100,7 @@ namespace Foolish.Utils.Editor.Windows
             }
             if (externalScenesPaths.Count > 0)
             {
-                EditorGUILayout.Space();
-                GUILayout.Label("External Scenes", "box", GUILayout.ExpandWidth(true));
-                EditorGUILayout.Space();
+                EditorWindowUI.Section($"External Scenes  ({externalScenesPaths.Count})");
             }
 
 
@@ -112,6 +115,7 @@ namespace Foolish.Utils.Editor.Windows
             }
 
             GUILayout.EndScrollView();
+            EditorWindowUI.EndPage();
         }
 
         void DrawSceneNormal(string scenePath, float maxWidth)
@@ -120,14 +124,14 @@ namespace Foolish.Utils.Editor.Windows
 
             GUILayout.BeginHorizontal(BoxStyle);
 
-            GUILayout.Label(sceneName, GUILayout.Width(90));
+            GUILayout.Label(new GUIContent(sceneName, scenePath), EditorStyles.boldLabel, GUILayout.MinWidth(90));
 
-            if (isLocked)
+            GUILayout.FlexibleSpace();
+
+            using (new EditorGUI.DisabledScope(isLocked))
             {
-                GUI.enabled = false;
-            }
 
-            if (GUILayout.Button("Open", GUILayout.Width(100)) && !isLocked)
+            if (GUILayout.Button("Open", GUILayout.Width(72)))
             {
                 if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                 {
@@ -135,7 +139,7 @@ namespace Foolish.Utils.Editor.Windows
                 }
             }
 
-            if (GUILayout.Button("Play", GUILayout.Width(100)) && !isLocked)
+            if (GUILayout.Button("Play", GUILayout.Width(72)))
             {
                 previousScenePath = SceneManager.GetActiveScene().path;
                 shouldReturnToPreviousScene = true;
@@ -145,13 +149,10 @@ namespace Foolish.Utils.Editor.Windows
                     EditorApplication.isPlaying = true;
                 }
             }
-			if (GUILayout.Button("S", GUILayout.Width(25)) && !isLocked)
+			if (GUILayout.Button(new GUIContent("●", "Select scene asset"), GUILayout.Width(28)))
 			{
 				ShowAndPingObjectByPath(scenePath);
 			}
-            if (isLocked)
-            {
-                GUI.enabled = true;
             }
 
             GUILayout.EndHorizontal();

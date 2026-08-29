@@ -38,32 +38,37 @@ namespace Foolish.Utils.Editor.Windows
 
         protected override void OnGUIInternal()
         {
-            EditorGUILayout.LabelField("Drag and drop assets below:", EditorStyles.boldLabel);
+            EditorWindowUI.BeginPage();
+            EditorWindowUI.Header("Bookmarks", "Keep frequently used project assets organized in groups.");
 
-            Rect dropArea = GUILayoutUtility.GetRect(0, 50, GUILayout.ExpandWidth(true));
-            GUI.Box(dropArea, "Drag assets here", EditorStyles.helpBox);
-            using (new EditorGUILayout.HorizontalScope("Box"))
+            Rect dropArea = EditorWindowUI.DropArea("Drop assets here", "Files and folders from the Project window are supported");
+            GUILayout.Space(4);
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                if (GUILayout.Button("Save List"))
+                if (GUILayout.Button("Save", EditorStyles.toolbarButton))
                 {
                     SaveData();
                 }
-                if (GUILayout.Button("Load List"))
+                if (GUILayout.Button("Reload", EditorStyles.toolbarButton))
                 {
                     LoadData();
                 }
-                if (GUILayout.Button("Clear List"))
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Clear", EditorStyles.toolbarButton))
                 {
                     ClearData();
                 }
             }
 
+            GUILayout.Space(8);
+            EditorWindowUI.Section("Groups");
             EditorGUILayout.BeginHorizontal();
-            newGroupName = EditorGUILayout.TextField("New Group Name", newGroupName);
-            if (GUILayout.Button("Create Group", GUILayout.Width(100)))
+            newGroupName = EditorGUILayout.TextField(newGroupName);
+            using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(newGroupName) || groupsData.ContainsKey(newGroupName.Trim())))
             {
-                if (!string.IsNullOrEmpty(newGroupName) && !groupsData.ContainsKey(newGroupName))
+                if (GUILayout.Button("Create Group", GUILayout.Width(100)))
                 {
+                    newGroupName = newGroupName.Trim();
                     groupsData.Add(newGroupName, new());
                     newGroupName = "";
                 }
@@ -79,6 +84,7 @@ namespace Foolish.Utils.Editor.Windows
                 DrawGroup(groupName, assetsIndexes);
             }
             EditorGUILayout.EndScrollView();
+            EditorWindowUI.EndPage();
         }
 
         void DrawGroup(string groupName, List<int> assetIndexes)
@@ -89,7 +95,7 @@ namespace Foolish.Utils.Editor.Windows
                 status = false;
                 expandedGroupStatus[groupName] = false;
             }
-            bool isExpanded = EditorGUILayout.Foldout(status, groupName);
+            bool isExpanded = EditorGUILayout.Foldout(status, $"{groupName}  ({assetIndexes.Count})", true);
             if (isExpanded)
             {
                 EditorGUILayout.BeginHorizontal("Box");
@@ -129,7 +135,7 @@ namespace Foolish.Utils.Editor.Windows
                 {
                     int index = assetIndexes[i];
                     DrawAssetRow(index);
-                    EditorGUILayout.Space(20);
+                    EditorGUILayout.Space(4);
                 }
             }
             expandedGroupStatus[groupName] = isExpanded;

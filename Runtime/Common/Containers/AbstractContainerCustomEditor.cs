@@ -46,6 +46,11 @@ namespace Foolish.Utils.Containers.Editor
         {
             root.Clear();
 
+            root.style.paddingLeft = 4;
+            root.style.paddingRight = 4;
+            root.style.paddingTop = 4;
+            root.style.paddingBottom = 4;
+
             serializedObject.Update();
 
             var iterator = serializedObject.GetIterator();
@@ -56,7 +61,9 @@ namespace Foolish.Utils.Containers.Editor
                 if (iterator.name != CONTAINER_NAME)
                 {
                     var field = new PropertyField(iterator);
-                    field.SetEnabled(false);
+                    // Unity's script reference is informational. All user-authored
+                    // serialized properties must remain editable in this inspector.
+                    field.SetEnabled(iterator.name != "m_Script");
                     root.Add(field);
                 }
                 enterChildren = false;
@@ -66,8 +73,13 @@ namespace Foolish.Utils.Containers.Editor
 
             var createButton = new Button(ShowTypeMenu)
             {
-                text = "Create Data",
+                text = "Add Element",
+                tooltip = "Create a new sub-asset and add it to this container",
             };
+
+            createButton.style.height = 28;
+            createButton.style.marginTop = 6;
+            createButton.style.unityFontStyleAndWeight = FontStyle.Bold;
 
             root.Add(createButton);
 
@@ -94,7 +106,17 @@ namespace Foolish.Utils.Containers.Editor
         {
             var container = new VisualElement();
 
-            container.Add(new Label("Elements list"));
+            var header = new Label("Elements")
+            {
+                style =
+                {
+                    unityFontStyleAndWeight = FontStyle.Bold,
+                    fontSize = 13,
+                    marginTop = 8,
+                    marginBottom = 4,
+                },
+            };
+            container.Add(header);
 
             RefreshSerializedProperty();
 
@@ -136,8 +158,18 @@ namespace Foolish.Utils.Containers.Editor
             var label = foldout.Q<Label>();
             label.style.unityFontStyleAndWeight = FontStyle.Bold;
 
-            var renameBtn = new Button(() => StartRename(item)) { text = "  Rename", style = { marginLeft = 1, }, };
-            var deleteBtn = new Button(() => DeleteItem(item)) { text = "  Delete", style = { marginLeft = 1, }, };
+            var renameBtn = new Button(() => StartRename(item))
+            {
+                text = "Rename",
+                tooltip = $"Rename {item.name}",
+                style = { marginLeft = 4, },
+            };
+            var deleteBtn = new Button(() => DeleteItem(item))
+            {
+                text = "Delete",
+                tooltip = $"Delete {item.name}",
+                style = { marginLeft = 2, },
+            };
 
 
             label.parent.Add(renameBtn);
@@ -255,14 +287,14 @@ namespace Foolish.Utils.Containers.Editor
 
         void ApplyBoxStyle(VisualElement ve)
         {
-            var borderWidth = 2;
+            var borderWidth = 1;
 #if UNITY_6000_0_OR_NEWER
             var borderColor = Color.gray6;
 #else
             var borderColor = Color.grey;
 #endif
             var paddings = 6;
-            var margins = 2;
+            var margins = 3;
 
             ve.style.marginRight = margins;
             ve.style.marginTop = margins;

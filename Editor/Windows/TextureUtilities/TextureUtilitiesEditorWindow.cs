@@ -29,59 +29,78 @@ namespace Foolish.Utils.Editor.Windows
 
         void OnGUI()
         {
+            EditorWindowUI.BeginPage();
+            EditorWindowUI.Header("Texture Utilities", GetWindowDescription());
+
             if (windowType != WindowType.Selection)
             {
                 using (new GUILayout.HorizontalScope())
                 {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("Go to Selection"))
+                    if (GUILayout.Button("‹ All Tools", EditorStyles.miniButton, GUILayout.Width(90)))
                     {
                         windowType = WindowType.Selection;
-                        return;
                     }
+                    GUILayout.FlexibleSpace();
                 }
-                GUILayout.Space(10);
+                GUILayout.Space(6);
             }
             switch (windowType)
             {
                 case WindowType.Slicer:
                     DrawSliceWindow();
-                    return;
+                    break;
                 case WindowType.Merger:
                     DrawMergeWindow();
-                    return;
+                    break;
                 case WindowType.Packer:
                     DrawTexturePackerWindow();
-                    return;
+                    break;
                 case WindowType.Transparency:
                     DrawTextureTransparencyWindow();
-                    return;
+                    break;
                 default:
                     DrawSelectionWindow();
                     break;
             }
+
+            EditorWindowUI.EndPage();
+        }
+
+        string GetWindowDescription()
+        {
+            return windowType switch
+            {
+                WindowType.Slicer => "Export individual sprites from a sliced texture.",
+                WindowType.Merger => "Combine multiple textures into one image.",
+                WindowType.Packer => "Pack textures into a Texture2DArray asset.",
+                WindowType.Transparency => "Improve texture edges by extending transparent pixel colors.",
+                _ => "Choose a texture processing tool.",
+            };
         }
 
         #region Selection
 
         void DrawSelectionWindow()
         {
-            if (GUILayout.Button("Slice Sprites"))
+            if (EditorWindowUI.PrimaryButton("Slice Sprites", GUILayout.Height(32)))
             {
                 windowType = WindowType.Slicer;
                 return;
             }
-            if (GUILayout.Button("Merge textures"))
+            GUILayout.Space(4);
+            if (EditorWindowUI.PrimaryButton("Merge Textures", GUILayout.Height(32)))
             {
                 windowType = WindowType.Merger;
                 return;
             }
-            if (GUILayout.Button("Pack textures into Texture2DArray"))
+            GUILayout.Space(4);
+            if (EditorWindowUI.PrimaryButton("Pack into Texture2DArray", GUILayout.Height(32)))
             {
                 windowType = WindowType.Packer;
             }
             
-            if (GUILayout.Button("Add alpha to texture edges"))
+            GUILayout.Space(4);
+            if (EditorWindowUI.PrimaryButton("Extend Transparent Edges", GUILayout.Height(32)))
             {
                 windowType = WindowType.Transparency;
             }
@@ -440,7 +459,7 @@ namespace Foolish.Utils.Editor.Windows
 
         #region Texture Packer
 
-        string fileNames = "None =)";
+        string fileNames = "None textures selected!";
         bool isDone;
         bool isFirsUpdate;
         List<Texture2D> texturesToPack = new();
